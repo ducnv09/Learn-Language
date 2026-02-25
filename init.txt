@@ -1,0 +1,17 @@
+mkdir server
+cd server
+npm init -y
+
+# Cài đặt Express và các thư viện hỗ trợ
+npm install express pg cors dotenv
+
+# Cài đặt nodemon để tự restart server khi code thay đổi
+npm install --save-dev nodemon
+
+
+# Tạo thư mục client chứa code React
+npm create vite@latest client -- --template react
+
+cd client
+npm install
+cd ..

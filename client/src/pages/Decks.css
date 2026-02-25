@@ -1,0 +1,39 @@
+/* ============================================
+   Decks Page
+   ============================================ */
+.decks-page {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.decks-toolbar {
+    margin-bottom: var(--space-6);
+}
+
+/* Create form */
+.deck-create-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+    max-width: 500px;
+}
+
+.deck-create-form h3 {
+    font-size: var(--font-lg);
+    font-weight: 700;
+}
+
+.deck-create-form input,
+.deck-create-form textarea {
+    width: 100%;
+}
+
+.deck-create-form textarea {
+    resize: vertical;
+}
+
+.deck-create-form .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
