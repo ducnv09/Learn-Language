@@ -153,6 +153,30 @@
     background: var(--bg-card-hover);
 }
 
+.card-list-item--dragging {
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent-primary);
+}
+
+.card-list-drag {
+    cursor: grab;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    padding: var(--space-1);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+}
+
+.card-list-drag:hover {
+    color: var(--text-secondary);
+    background: var(--bg-input);
+}
+
+.card-list-drag:active {
+    cursor: grabbing;
+}
+
 .card-list-number {
     width: 32px;
     height: 32px;

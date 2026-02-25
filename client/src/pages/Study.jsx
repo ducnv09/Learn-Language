@@ -1,12 +1,48 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { HiOutlineArrowLeft, HiOutlineArrowRight, HiOutlineChevronLeft, HiOutlineRefresh, HiOutlinePencil, HiOutlineTrash, HiOutlinePlus, HiOutlineX } from 'react-icons/hi';
+import { HiOutlineArrowLeft, HiOutlineArrowRight, HiOutlineChevronLeft, HiOutlineRefresh, HiOutlinePencil, HiOutlineTrash, HiOutlinePlus, HiOutlineX, HiOutlineSelector } from 'react-icons/hi';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import FlashcardItem from '../components/FlashcardItem';
 import { getFlashcards, createFlashcard, updateFlashcard, deleteFlashcard } from '../services/flashcardService';
 import { getDeck } from '../services/deckService';
 import ConfirmDialog from '../components/ConfirmDialog';
 import FlashcardModal from '../components/FlashcardModal';
 import './Study.css';
+
+function SortableCardItem({ card, index, onEdit, onDelete }) {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: card.id });
+    
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+        zIndex: isDragging ? 1000 : 'auto',
+    };
+
+    return (
+        <div ref={setNodeRef} style={style} className={`card-list-item ${isDragging ? 'card-list-item--dragging' : ''}`}>
+            <div className="card-list-drag" {...attributes} {...listeners}>
+                <HiOutlineSelector />
+            </div>
+            <div className="card-list-number">{index + 1}</div>
+            <div className="card-list-content">
+                <div className="card-list-word">{card.word}</div>
+                {card.definition && <div className="card-list-def">{card.definition}</div>}
+                {card.translation && <div className="card-list-trans">🇻🇳 {card.translation}</div>}
+            </div>
+            <div className="card-list-actions">
+                <button className="btn-icon" title="Chỉnh sửa" onClick={() => onEdit(card)}>
+                    <HiOutlinePencil />
+                </button>
+                <button className="btn-icon btn-icon--danger" title="Xóa" onClick={() => onDelete(card)}>
+                    <HiOutlineTrash />
+                </button>
+            </div>
+        </div>
+    );
+}
 
 function Study() {
     const { deckId } = useParams();
@@ -20,6 +56,11 @@ function Study() {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('add');
     const [editingCard, setEditingCard] = useState(null);
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    );
 
     useEffect(() => {
         Promise.all([getDeck(deckId), getFlashcards(deckId)])
@@ -84,6 +125,17 @@ function Study() {
         }
     };
 
+    const handleDragEnd = (event) => {
+        const { active, over } = event;
+        if (active.id !== over?.id) {
+            setCards((items) => {
+                const oldIndex = items.findIndex((item) => item.id === active.id);
+                const newIndex = items.findIndex((item) => item.id === over.id);
+                return arrayMove(items, oldIndex, newIndex);
+            });
+        }
+    };
+
     if (loading) {
         return (
             <div className="study-page">
@@ -141,34 +193,21 @@ function Study() {
                         </button>
                     </div>
 
-                    <div className="card-list">
-                        {cards.map((card, index) => (
-                            <div key={card.id} className="card-list-item">
-                                <div className="card-list-number">{index + 1}</div>
-                                <div className="card-list-content">
-                                    <div className="card-list-word">{card.word}</div>
-                                    {card.definition && <div className="card-list-def">{card.definition}</div>}
-                                    {card.translation && <div className="card-list-trans">🇻🇳 {card.translation}</div>}
-                                </div>
-                                <div className="card-list-actions">
-                                    <button 
-                                        className="btn-icon" 
-                                        title="Chỉnh sửa"
-                                        onClick={() => handleEditClick(card)}
-                                    >
-                                        <HiOutlinePencil />
-                                    </button>
-                                    <button 
-                                        className="btn-icon btn-icon--danger" 
-                                        title="Xóa"
-                                        onClick={() => setDeleteTarget(card)}
-                                    >
-                                        <HiOutlineTrash />
-                                    </button>
-                                </div>
+                    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                        <SortableContext items={cards.map(c => c.id)} strategy={verticalListSortingStrategy}>
+                            <div className="card-list">
+                                {cards.map((card, index) => (
+                                    <SortableCardItem 
+                                        key={card.id} 
+                                        card={card} 
+                                        index={index}
+                                        onEdit={handleEditClick}
+                                        onDelete={setDeleteTarget}
+                                    />
+                                ))}
                             </div>
-                        ))}
-                    </div>
+                        </SortableContext>
+                    </DndContext>
                 </div>
             ) : (
                 <>
