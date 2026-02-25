@@ -1,0 +1,117 @@
+.flashcard-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(6px);
+    animation: fadeIn 0.15s ease;
+}
+
+.flashcard-modal {
+    width: 90%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: var(--bg-primary);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow:
+        0 24px 48px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-lg);
+    animation: scaleIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.85) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.flashcard-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-5) var(--space-6);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.flashcard-modal-header h3 {
+    font-size: var(--font-lg);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.flashcard-modal-close {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.flashcard-modal-close:hover {
+    background: var(--bg-card);
+    color: var(--text-primary);
+}
+
+.flashcard-modal-form {
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.flashcard-modal-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.flashcard-modal-field label {
+    font-size: var(--font-sm);
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.flashcard-modal-field .required {
+    color: var(--accent-danger);
+}
+
+.flashcard-modal-field input,
+.flashcard-modal-field textarea {
+    width: 100%;
+}
+
+.flashcard-modal-actions {
+    display: flex;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+}
+
+.flashcard-modal-actions .btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-5);
+    font-weight: 600;
+    font-size: var(--font-sm);
+    border-radius: var(--radius-md);
+    min-height: 44px;
+}
