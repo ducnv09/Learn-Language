@@ -2,7 +2,7 @@
    Exercise Card
    ============================================ */
 .exercise-card {
-    max-width: 600px;
+    /* max-width: 600px; */
     margin: 0 auto;
     padding: var(--space-8);
 }

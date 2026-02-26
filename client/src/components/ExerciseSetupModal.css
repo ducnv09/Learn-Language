@@ -39,6 +39,9 @@
 .exercise-setup-header {
     padding: var(--space-5) var(--space-6);
     border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .exercise-setup-header h3 {
@@ -46,6 +49,25 @@
     font-weight: 700;
     color: var(--text-primary);
     margin: 0;
+}
+
+.exercise-setup-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.exercise-setup-close:hover {
+    background: var(--bg-card-hover);
+    color: var(--text-primary);
 }
 
 .exercise-setup-content {

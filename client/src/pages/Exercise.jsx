@@ -52,7 +52,7 @@ function Exercise() {
         }
 
         if (finalExercises.length === 0) {
-            finalExercises = selectedCards.slice(0, 5).map((card, index) => {
+            finalExercises = selectedCards.map((card, index) => {
                 if (exerciseType === 'multiple_choice') {
                     const wrongOptions = cards
                         .filter(c => c.id !== card.id)
@@ -145,6 +145,7 @@ function Exercise() {
                             open={true}
                             cards={cards}
                             onStart={handleStartExercise}
+                            onClose={() => navigate('/decks')}
                         />
                     )}
                 </>

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { HiOutlineX, HiOutlineCheck, HiOutlineCollection } from 'react-icons/hi';
 import './ExerciseSetupModal.css';
 
-function ExerciseSetupModal({ open, cards, onStart }) {
+function ExerciseSetupModal({ open, cards, onStart, onClose }) {
     const [exerciseType, setExerciseType] = useState('multiple_choice');
     const [selectedCards, setSelectedCards] = useState([]);
     const [selectMode, setSelectMode] = useState('all');
@@ -45,10 +45,13 @@ function ExerciseSetupModal({ open, cards, onStart }) {
         : cards;
 
     return createPortal(
-        <div className="exercise-setup-overlay" onClick={() => {}}>
+        <div className="exercise-setup-overlay" onClick={onClose}>
             <div className="exercise-setup-modal animate-fade-in" onClick={e => e.stopPropagation()}>
                 <div className="exercise-setup-header">
                     <h3>Thiết lập bài luyện tập</h3>
+                    <button className="exercise-setup-close" onClick={onClose}>
+                        <HiOutlineX />
+                    </button>
                 </div>
 
                 <div className="exercise-setup-content">
