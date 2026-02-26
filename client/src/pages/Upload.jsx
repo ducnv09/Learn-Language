@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { HiOutlineCloudUpload, HiOutlineSparkles } from 'react-icons/hi';
+import { HiOutlineCloudUpload, HiOutlineSparkles, HiOutlineDocument } from 'react-icons/hi';
 import FileUploadZone from '../components/FileUploadZone';
 import { uploadFiles } from '../services/uploadService';
 import { processFiles } from '../services/exerciseService';
@@ -9,6 +9,7 @@ import './Upload.css';
 function Upload() {
     const navigate = useNavigate();
     const [files, setFiles] = useState([]);
+    const [uploadedFiles, setUploadedFiles] = useState([]);
     const [uploading, setUploading] = useState(false);
     const [processing, setProcessing] = useState(false);
     const [uploadedFileIds, setUploadedFileIds] = useState([]);
@@ -28,8 +29,9 @@ function Upload() {
             const res = await uploadFiles(formData);
             const ids = res.files.map((f) => f.id);
             setUploadedFileIds(ids);
-            setResult({ success: true, message: `${res.message}. Bây giờ bạn có thể xử lý bằng AI!` });
+            setUploadedFiles(files);
             setFiles([]);
+            setResult({ success: true, message: `${res.message}. Bây giờ bạn có thể xử lý bằng AI!` });
         } catch (err) {
             setResult({
                 success: false,
@@ -75,7 +77,29 @@ function Upload() {
             </div>
 
             <div className="upload-content card">
-                <FileUploadZone files={files} setFiles={setFiles} />
+                {uploadedFiles.length === 0 && (
+                    <FileUploadZone files={files} setFiles={setFiles} />
+                )}
+
+                {uploadedFiles.length > 0 && (
+                    <div className="upload-file-list">
+                        <h3 className="upload-file-list-title">
+                            File đã tải lên ({uploadedFiles.length})
+                        </h3>
+                        {uploadedFiles.map((file, index) => (
+                            <div key={index} className="upload-file-item">
+                                <HiOutlineDocument className="upload-file-item-icon" />
+                                <div className="upload-file-item-info">
+                                    <span className="upload-file-item-name">{file.name}</span>
+                                    <span className="upload-file-item-size">
+                                        {(file.size / 1024 / 1024).toFixed(2)} MB
+                                    </span>
+                                </div>
+                                <span className="upload-file-item-status">✓ Đã upload</span>
+                            </div>
+                        ))}
+                    </div>
+                )}
 
                 {result && (
                     <div className={`upload-result ${result.success ? 'upload-result--success' : 'upload-result--error'}`}>
@@ -94,25 +118,27 @@ function Upload() {
                 )}
 
                 {/* Step 1: Upload files */}
-                <div className="upload-actions">
-                    <button
-                        className="btn btn-primary"
-                        disabled={files.length === 0 || uploading}
-                        onClick={handleUpload}
-                    >
-                        {uploading ? (
-                            <>
-                                <div className="loading-spinner" style={{ width: 18, height: 18, borderWidth: 2 }}></div>
-                                Đang tải lên...
-                            </>
-                        ) : (
-                            <>
-                                <HiOutlineCloudUpload />
-                                Tải lên ({files.length} file)
-                            </>
-                        )}
-                    </button>
-                </div>
+                {files.length > 0 && (
+                    <div className="upload-actions">
+                        <button
+                            className="btn btn-primary"
+                            disabled={files.length === 0 || uploading}
+                            onClick={handleUpload}
+                        >
+                            {uploading ? (
+                                <>
+                                    <div className="loading-spinner loading-spinner--white" style={{ width: 18, height: 18, borderWidth: 2 }}></div>
+                                    Đang tải lên...
+                                </>
+                            ) : (
+                                <>
+                                    <HiOutlineCloudUpload />
+                                    Tải lên ({files.length} file)
+                                </>
+                            )}
+                        </button>
+                    </div>
+                )}
 
                 {/* Step 2: AI Processing */}
                 {uploadedFileIds.length > 0 && (
@@ -132,8 +158,8 @@ function Upload() {
                         >
                             {processing ? (
                                 <>
-                                    <div className="loading-spinner" style={{ width: 18, height: 18, borderWidth: 2 }}></div>
-                                    Đang xử lý AI... (có thể mất 30-60s)
+                                    <div className="loading-spinner loading-spinner--white" style={{ width: 18, height: 18, borderWidth: 2 }}></div>
+                                    AI đang OCR...
                                 </>
                             ) : (
                                 <>

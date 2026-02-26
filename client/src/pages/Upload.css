@@ -73,10 +73,16 @@
 }
 
 .upload-ai-section input {
-    max-width: 400px;
+    /* max-width: 400px; */
 }
 
 .upload-ai-section .btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+.upload-file-item-status {
+    font-size: var(--font-xs);
+    color: var(--accent-success);
+    font-weight: 600;
 }
