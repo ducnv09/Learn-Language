@@ -36,24 +36,26 @@ function FileUploadZone({ files, setFiles }) {
 
     return (
         <div className="upload-zone-wrapper">
-            <div
-                {...getRootProps()}
-                className={`upload-dropzone ${isDragActive ? 'upload-dropzone--active' : ''}`}
-            >
-                <input {...getInputProps()} />
-                <div className="upload-dropzone-content">
-                    <HiOutlineCloudUpload className="upload-dropzone-icon" />
-                    <p className="upload-dropzone-title">
-                        {isDragActive ? 'Thả file vào đây...' : 'Kéo & thả file vào đây'}
-                    </p>
-                    <p className="upload-dropzone-subtitle">
-                        hoặc <span>click để chọn file</span>
-                    </p>
-                    <p className="upload-dropzone-hint">
-                        Hỗ trợ: JPG, PNG, PDF, DOC, DOCX, XLS, XLSX (tối đa 20MB)
-                    </p>
+            {files.length === 0 && (
+                <div
+                    {...getRootProps()}
+                    className={`upload-dropzone ${isDragActive ? 'upload-dropzone--active' : ''}`}
+                >
+                    <input {...getInputProps()} />
+                    <div className="upload-dropzone-content">
+                        <HiOutlineCloudUpload className="upload-dropzone-icon" />
+                        <p className="upload-dropzone-title">
+                            {isDragActive ? 'Thả file vào đây...' : 'Kéo & thả file vào đây'}
+                        </p>
+                        <p className="upload-dropzone-subtitle">
+                            hoặc <span>click để chọn file</span>
+                        </p>
+                        <p className="upload-dropzone-hint">
+                            Hỗ trợ: JPG, PNG, PDF, DOC, DOCX, XLS, XLSX (tối đa 20MB)
+                        </p>
+                    </div>
                 </div>
-            </div>
+            )}
 
             {files.length > 0 && (
                 <div className="upload-file-list">
@@ -75,6 +77,25 @@ function FileUploadZone({ files, setFiles }) {
                             </button>
                         </div>
                     ))}
+                    <button
+                        className="btn btn-secondary upload-add-more"
+                        onClick={() => document.getElementById('file-input-trigger')?.click()}
+                    >
+                        + Thêm file
+                    </button>
+                    <input
+                        id="file-input-trigger"
+                        type="file"
+                        multiple
+                        accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx"
+                        style={{ display: 'none' }}
+                        onChange={(e) => {
+                            if (e.target.files?.length) {
+                                setFiles((prev) => [...prev, ...Array.from(e.target.files)]);
+                                e.target.value = '';
+                            }
+                        }}
+                    />
                 </div>
             )}
         </div>
