@@ -38,3 +38,6 @@ server/*.log
 
 # OS
 Thumbs.db
+
+# OCR trained data (optional - can use CDN instead)
+*.traineddata
