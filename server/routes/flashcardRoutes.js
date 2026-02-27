@@ -7,5 +7,6 @@ router.post('/', flashcardController.create);
 router.post('/bulk', flashcardController.createMany);
 router.put('/:id', flashcardController.update);
 router.delete('/:id', flashcardController.delete);
+router.post('/bulk-delete', flashcardController.deleteMany);
 
 module.exports = router;

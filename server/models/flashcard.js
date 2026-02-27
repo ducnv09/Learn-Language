@@ -52,6 +52,11 @@ const Flashcard = {
     const result = await pool.query('DELETE FROM flashcards WHERE id = $1 RETURNING *', [id]);
     return result.rows[0];
   },
+
+  async deleteMany(ids) {
+    const result = await pool.query('DELETE FROM flashcards WHERE id = ANY($1) RETURNING *', [ids]);
+    return result.rows;
+  },
 };
 
 module.exports = Flashcard;

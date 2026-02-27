@@ -5,13 +5,13 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import FlashcardItem from '../components/FlashcardItem';
-import { getFlashcards, createFlashcard, updateFlashcard, deleteFlashcard } from '../services/flashcardService';
+import { getFlashcards, createFlashcard, updateFlashcard, deleteFlashcard, deleteManyFlashcards } from '../services/flashcardService';
 import { getDeck } from '../services/deckService';
 import ConfirmDialog from '../components/ConfirmDialog';
 import FlashcardModal from '../components/FlashcardModal';
 import './Study.css';
 
-function SortableCardItem({ card, index, onEdit, onDelete }) {
+function SortableCardItem({ card, index, onEdit, onDelete, isSelected, onSelect }) {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: card.id });
     
     const style = {
@@ -22,7 +22,14 @@ function SortableCardItem({ card, index, onEdit, onDelete }) {
     };
 
     return (
-        <div ref={setNodeRef} style={style} className={`card-list-item ${isDragging ? 'card-list-item--dragging' : ''}`}>
+        <div ref={setNodeRef} style={style} className={`card-list-item ${isDragging ? 'card-list-item--dragging' : ''} ${isSelected ? 'card-list-item--selected' : ''}`}>
+            <div className="card-list-checkbox">
+                <input 
+                    type="checkbox" 
+                    checked={isSelected} 
+                    onChange={() => onSelect(card.id)}
+                />
+            </div>
             <div className="card-list-drag" {...attributes} {...listeners}>
                 <HiOutlineSelector />
             </div>
@@ -56,6 +63,7 @@ function Study() {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('add');
     const [editingCard, setEditingCard] = useState(null);
+    const [selectedCards, setSelectedCards] = useState([]);
 
     const sensors = useSensors(
         useSensor(PointerSensor),
@@ -136,6 +144,37 @@ function Study() {
         }
     };
 
+    const handleSelectCard = (cardId) => {
+        setSelectedCards(prev => 
+            prev.includes(cardId) 
+                ? prev.filter(id => id !== cardId)
+                : [...prev, cardId]
+        );
+    };
+
+    const handleSelectAll = () => {
+        if (selectedCards.length === cards.length) {
+            setSelectedCards([]);
+        } else {
+            setSelectedCards(cards.map(c => c.id));
+        }
+    };
+
+    const handleDeleteSelected = async () => {
+        if (selectedCards.length === 0) return;
+        try {
+            await deleteManyFlashcards(selectedCards);
+            const newCards = cards.filter(c => !selectedCards.includes(c.id));
+            setCards(newCards);
+            setSelectedCards([]);
+            if (currentIndex >= newCards.length && currentIndex > 0) {
+                setCurrentIndex(newCards.length - 1);
+            }
+        } catch (err) {
+            console.error('Failed to delete cards:', err);
+        }
+    };
+
     if (loading) {
         return (
             <div className="study-page">
@@ -187,10 +226,21 @@ function Study() {
                 <div className="edit-mode">
                     <div className="edit-mode-header">
                         <h3>Quản lý từ vựng ({cards.length} từ)</h3>
-                        <button className="btn btn-primary" onClick={handleAddClick}>
-                            <HiOutlinePlus />
-                            Thêm từ mới
-                        </button>
+                        <div className="edit-mode-actions">
+                            {selectedCards.length > 0 && (
+                                <button className="btn btn-danger" onClick={handleDeleteSelected}>
+                                    <HiOutlineTrash />
+                                    Xóa ({selectedCards.length})
+                                </button>
+                            )}
+                            <button className="btn btn-secondary" onClick={handleSelectAll}>
+                                {selectedCards.length === cards.length ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
+                            </button>
+                            <button className="btn btn-primary" onClick={handleAddClick}>
+                                <HiOutlinePlus />
+                                Thêm từ mới
+                            </button>
+                        </div>
                     </div>
 
                     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -203,6 +253,8 @@ function Study() {
                                         index={index}
                                         onEdit={handleEditClick}
                                         onDelete={setDeleteTarget}
+                                        isSelected={selectedCards.includes(card.id)}
+                                        onSelect={handleSelectCard}
                                     />
                                 ))}
                             </div>

@@ -14,3 +14,6 @@ export const updateFlashcard = (id, data) =>
 
 export const deleteFlashcard = (id) =>
   api.delete(`/flashcards/${id}`).then((res) => res.data);
+
+export const deleteManyFlashcards = (ids) =>
+  api.post('/flashcards/bulk-delete', { ids }).then((res) => res.data);
