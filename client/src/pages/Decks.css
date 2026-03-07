@@ -10,6 +10,34 @@
     margin-bottom: var(--space-6);
 }
 
+.normal-toolbar,
+.selection-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    background: var(--surface-light);
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+}
+
+.normal-toolbar {
+    justify-content: flex-end;
+}
+
+.selection-count {
+    font-weight: 600;
+    color: var(--accent-primary);
+}
+
+.selection-actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
 /* Create form */
 .deck-create-form {
     display: flex;

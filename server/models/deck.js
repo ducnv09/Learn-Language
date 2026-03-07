@@ -37,6 +37,10 @@ const Deck = {
     const result = await pool.query('DELETE FROM decks WHERE id = $1 RETURNING *', [id]);
     return result.rows[0];
   },
+  async deleteMany(ids) {
+    const result = await pool.query('DELETE FROM decks WHERE id = ANY($1::int[]) RETURNING *', [ids]);
+    return result.rows;
+  },
 };
 
 module.exports = Deck;

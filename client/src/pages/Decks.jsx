@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { HiOutlinePlus, HiOutlineX } from 'react-icons/hi';
+import { HiOutlinePlus, HiOutlineX, HiOutlineTrash, HiOutlineCheck } from 'react-icons/hi';
 import DeckCard from '../components/DeckCard';
 import ConfirmDialog from '../components/ConfirmDialog';
-import { getDecks, createDeck, updateDeck, deleteDeck } from '../services/deckService';
+import { getDecks, createDeck, updateDeck, deleteDeck, deleteManyDecks } from '../services/deckService';
 import './Decks.css';
 
 function Decks() {
@@ -12,6 +12,8 @@ function Decks() {
     const [newDeck, setNewDeck] = useState({ name: '', description: '' });
     const [creating, setCreating] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState(null);
+    const [selectionMode, setSelectionMode] = useState(false);
+    const [selectedDecks, setSelectedDecks] = useState([]);
 
     const fetchDecks = () => {
         getDecks()
@@ -47,14 +49,37 @@ function Decks() {
     };
 
     const handleDeleteConfirm = async () => {
-        if (!deleteTarget) return;
         try {
-            await deleteDeck(deleteTarget.id);
+            if (selectionMode && selectedDecks.length > 0) {
+                await deleteManyDecks(selectedDecks);
+                setSelectedDecks([]);
+                setSelectionMode(false);
+            } else if (deleteTarget) {
+                await deleteDeck(deleteTarget.id);
+            } else {
+                return;
+            }
             fetchDecks();
         } catch (err) {
-            console.error('Failed to delete deck:', err);
+            console.error('Failed to delete deck(s):', err);
         } finally {
             setDeleteTarget(null);
+        }
+    };
+
+    const handleSelectDeck = (id) => {
+        setSelectedDecks(prev =>
+            prev.includes(id)
+                ? prev.filter(deckId => deckId !== id)
+                : [...prev, id]
+        );
+    };
+
+    const handleSelectAll = () => {
+        if (selectedDecks.length === decks.length) {
+            setSelectedDecks([]);
+        } else {
+            setSelectedDecks(decks.map(d => d.id));
         }
     };
 
@@ -75,10 +100,43 @@ function Decks() {
             </div>
 
             <div className="decks-toolbar">
-                <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
-                    {showForm ? <HiOutlineX /> : <HiOutlinePlus />}
-                    {showForm ? 'Hủy' : 'Tạo bộ từ mới'}
-                </button>
+                {selectionMode ? (
+                    <div className="selection-toolbar animate-fade-in">
+                        <span className="selection-count">
+                            Đã chọn {selectedDecks.length} bộ từ
+                        </span>
+                        <div className="selection-actions">
+                            <button className="btn btn-secondary" onClick={handleSelectAll}>
+                                {selectedDecks.length === decks.length ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
+                            </button>
+                            {selectedDecks.length > 0 && (
+                                <button className="btn btn-danger" onClick={() => setDeleteTarget({ isBulk: true })}>
+                                    <HiOutlineTrash />
+                                    Xóa đã chọn
+                                </button>
+                            )}
+                            <button className="btn btn-secondary" onClick={() => {
+                                setSelectionMode(false);
+                                setSelectedDecks([]);
+                            }}>
+                                Xong
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="normal-toolbar animate-fade-in">
+                        {decks.length > 0 && (
+                            <button className="btn btn-secondary" onClick={() => setSelectionMode(true)}>
+                                <HiOutlineCheck />
+                                Chọn nhiều
+                            </button>
+                        )}
+                        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
+                            {showForm ? <HiOutlineX /> : <HiOutlinePlus />}
+                            {showForm ? 'Hủy' : 'Tạo bộ từ mới'}
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* Create form */}
@@ -123,6 +181,9 @@ function Decks() {
                             deck={deck}
                             onDelete={handleDeleteClick}
                             onRename={handleRename}
+                            selectionMode={selectionMode}
+                            isSelected={selectedDecks.includes(deck.id)}
+                            onSelect={handleSelectDeck}
                         />
                     ))}
                 </div>
@@ -131,8 +192,11 @@ function Decks() {
             {/* Delete confirm dialog */}
             <ConfirmDialog
                 open={!!deleteTarget}
-                title="Xóa bộ từ vựng"
-                message={`Bạn có chắc muốn xóa "${deleteTarget?.name}"? Tất cả flashcard và bài tập trong bộ này cũng sẽ bị xóa vĩnh viễn.`}
+                title={deleteTarget?.isBulk ? "Xóa nhiều bộ từ vựng" : "Xóa bộ từ vựng"}
+                message={deleteTarget?.isBulk
+                    ? `Bạn có chắc muốn xóa ${selectedDecks.length} bộ từ vựng đã chọn? Tất cả flashcard và bài tập trong các bộ này sẽ bị xóa vĩnh viễn.`
+                    : `Bạn có chắc muốn xóa "${deleteTarget?.name}"? Tất cả flashcard và bài tập trong bộ này cũng sẽ bị xóa vĩnh viễn.`
+                }
                 confirmText="Xóa"
                 cancelText="Hủy"
                 danger

@@ -7,5 +7,6 @@ router.get('/:id', deckController.getById);
 router.post('/', deckController.create);
 router.put('/:id', deckController.update);
 router.delete('/:id', deckController.delete);
+router.post('/bulk-delete', deckController.deleteMany);
 
 module.exports = router;

@@ -51,6 +51,18 @@ const deckController = {
       next(err);
     }
   },
+  async deleteMany(req, res, next) {
+    try {
+      const { ids } = req.body;
+      if (!ids || !ids.length) {
+        return res.status(400).json({ error: 'ids array is required' });
+      }
+      const deleted = await Deck.deleteMany(ids);
+      res.json({ message: 'Decks deleted', count: deleted.length });
+    } catch (err) {
+      next(err);
+    }
+  },
 };
 
 module.exports = deckController;

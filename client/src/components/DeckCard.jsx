@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { HiOutlineCollection, HiOutlinePlay, HiOutlineAcademicCap, HiOutlinePencil, HiOutlineTrash, HiOutlineCheck, HiOutlineX } from 'react-icons/hi';
 import './DeckCard.css';
 
-function DeckCard({ deck, onDelete, onRename }) {
+function DeckCard({ deck, onDelete, onRename, selectionMode, isSelected, onSelect }) {
     const navigate = useNavigate();
     const [editing, setEditing] = useState(false);
     const [editName, setEditName] = useState(deck.name);
@@ -19,33 +19,51 @@ function DeckCard({ deck, onDelete, onRename }) {
     };
 
     return (
-        <div className="deck-card card">
+        <div className={`deck-card card ${isSelected ? 'deck-card--selected' : ''}`} onClick={() => {
+            if (selectionMode) {
+                onSelect(deck.id);
+            }
+        }}>
             <div className="deck-card-header">
                 <div className="deck-card-icon-wrapper">
-                    <HiOutlineCollection className="deck-card-icon" />
+                    {selectionMode ? (
+                        <input
+                            type="checkbox"
+                            className="deck-card-checkbox"
+                            checked={isSelected}
+                            onChange={() => onSelect(deck.id)}
+                            onClick={(e) => e.stopPropagation()}
+                        />
+                    ) : (
+                        <HiOutlineCollection className="deck-card-icon" />
+                    )}
                 </div>
                 <div className="deck-card-actions">
                     <span className="badge">{deck.card_count || 0} từ</span>
-                    <button
-                        className="deck-action-btn"
-                        title="Đổi tên"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setEditing(true);
-                        }}
-                    >
-                        <HiOutlinePencil />
-                    </button>
-                    <button
-                        className="deck-action-btn deck-action-btn--danger"
-                        title="Xóa"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onDelete(deck.id);
-                        }}
-                    >
-                        <HiOutlineTrash />
-                    </button>
+                    {!selectionMode && (
+                        <>
+                            <button
+                                className="deck-action-btn"
+                                title="Đổi tên"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setEditing(true);
+                                }}
+                            >
+                                <HiOutlinePencil />
+                            </button>
+                            <button
+                                className="deck-action-btn deck-action-btn--danger"
+                                title="Xóa"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onDelete(deck.id);
+                                }}
+                            >
+                                <HiOutlineTrash />
+                            </button>
+                        </>
+                    )}
                 </div>
             </div>
 
@@ -77,7 +95,11 @@ function DeckCard({ deck, onDelete, onRename }) {
                     </div>
                 </div>
             ) : (
-                <h3 className="deck-card-title" onClick={() => navigate(`/study/${deck.id}`)}>
+                <h3 className="deck-card-title" onClick={(e) => {
+                    if (!selectionMode) {
+                        navigate(`/study/${deck.id}`);
+                    }
+                }}>
                     {deck.name}
                 </h3>
             )}
