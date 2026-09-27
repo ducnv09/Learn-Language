@@ -1,0 +1,48 @@
+.quiz-create-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.upload-content {
+  padding: 30px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.upload-ai-section {
+  margin-top: 24px;
+  padding: 24px;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.upload-ai-section h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: #3b82f6;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.upload-ai-section input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 1rem;
+}
+
+.upload-ai-section input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.mt-2 {
+  margin-top: 8px;
+}

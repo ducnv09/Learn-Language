@@ -1,0 +1,163 @@
+.quiz-edit-page {
+  padding: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.edit-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.btn-back {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  color: #8b9bb4;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+
+.btn-back:hover {
+  color: #fff;
+}
+
+.edit-header h2 {
+  margin: 0;
+  flex: 1;
+}
+
+.edit-section {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 25px;
+}
+
+.edit-section h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 1.2rem;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 15px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #a0aec0;
+  font-weight: 500;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 15px;
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.question-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.question-edit-card {
+  background: rgba(15, 23, 42, 0.3);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.question-edit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.question-edit-header h4 {
+  margin: 0;
+  color: var(--primary-light);
+}
+
+.options-edit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.option-edit-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.option-edit-item input[type="text"] {
+  flex: 1;
+}
+
+.option-correct-toggle {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+
+.add-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--primary-light);
+  border: 1px dashed var(--primary-color);
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.add-btn:hover {
+  background: rgba(99, 102, 241, 0.2);
+}
+
+.save-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  position: sticky;
+  bottom: 20px;
+  background: var(--card-bg);
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid var(--primary-color);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  z-index: 10;
+}

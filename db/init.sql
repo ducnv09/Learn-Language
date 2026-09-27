@@ -41,3 +41,22 @@ CREATE TABLE IF NOT EXISTS exercises (
   correct_answer TEXT NOT NULL,
   created_at TIMESTAMP DEFAULT NOW()
 );
+
+CREATE TABLE IF NOT EXISTS quiz_banks (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS questions (
+  id SERIAL PRIMARY KEY,
+  quiz_bank_id INTEGER REFERENCES quiz_banks(id) ON DELETE CASCADE,
+  question_text TEXT NOT NULL,
+  options JSONB NOT NULL,
+  correct_answers JSONB NOT NULL,
+  explanation TEXT,
+  question_type VARCHAR(50) NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);

@@ -7,6 +7,7 @@ const flashcardRoutes = require('./routes/flashcardRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const processRoutes = require('./routes/processRoutes');
 const exerciseRoutes = require('./routes/exerciseRoutes');
+const quizRoutes = require('./routes/quizRoutes');
 const errorHandler = require('./middleware/errorHandler');
 const { initBucket } = require('./config/minio');
 
@@ -28,6 +29,7 @@ app.use('/api/flashcards', flashcardRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/process', processRoutes);
 app.use('/api/exercises', exerciseRoutes);
+app.use('/api/quizzes', quizRoutes);
 
 // Error handler
 app.use(errorHandler);

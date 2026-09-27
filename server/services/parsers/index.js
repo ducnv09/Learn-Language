@@ -22,6 +22,11 @@ async function parseFile(buffer, mimetype) {
     case 'application/vnd.ms-excel':
       return parseExcel(buffer);
 
+    case 'text/plain':
+    case 'application/rtf':
+    case 'text/rtf':
+      return buffer.toString('utf-8');
+
     case 'image/jpeg':
     case 'image/png':
       return await parseImage(buffer);

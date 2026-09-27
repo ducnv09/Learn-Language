@@ -6,6 +6,22 @@
 /**
  * Remove excessive whitespace, blank lines, and normalize spacing
  */
+function stripRtf(text) {
+  if (typeof text !== 'string') return text;
+  if (!text.startsWith('{\\rtf')) return text;
+  
+  // 1. Remove long hex strings (usually embedded images in RTF) which bloat the file
+  let result = text.replace(/[0-9a-fA-F]{100,}/g, '');
+  // 2. Remove RTF commands
+  result = result.replace(/\\[a-zA-Z]+(-?[0-9]+)? ?/g, ' ');
+  // 3. Remove escaped characters like \\, \{, \}
+  result = result.replace(/\\[{}~\-\\]/g, '');
+  // 4. Remove all braces
+  result = result.replace(/[{}]/g, '');
+  
+  return result;
+}
+
 function normalizeWhitespace(text) {
   return text
     .replace(/\r\n/g, '\n')
@@ -49,7 +65,8 @@ function extractMeaningfulLines(text) {
  * Full cleaning pipeline: normalize → clean artifacts → extract meaningful content
  */
 function cleanText(text) {
-  let result = normalizeWhitespace(text);
+  let result = stripRtf(text);
+  result = normalizeWhitespace(result);
   result = cleanOcrArtifacts(result);
   result = extractMeaningfulLines(result);
   return result;

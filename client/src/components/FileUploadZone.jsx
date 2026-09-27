@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { HiOutlineCloudUpload, HiOutlineX, HiOutlineDocument } from 'react-icons/hi';
 import './FileUploadZone.css';
@@ -11,12 +11,30 @@ const ACCEPT = {
     'application/msword': ['.doc'],
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
     'application/vnd.ms-excel': ['.xls'],
+    'text/plain': ['.txt'],
+    'application/rtf': ['.rtf'],
+    'text/rtf': ['.rtf'],
 };
 
 function FileUploadZone({ files, setFiles }) {
+    const [errorMsg, setErrorMsg] = useState(null);
     const onDrop = useCallback((acceptedFiles) => {
+        setErrorMsg(null);
         setFiles((prev) => [...prev, ...acceptedFiles]);
     }, [setFiles]);
+
+    const onDropRejected = useCallback((fileRejections) => {
+        const file = fileRejections[0]?.file;
+        const errCode = fileRejections[0]?.errors[0]?.code;
+        
+        if (errCode === 'file-too-large') {
+            setErrorMsg(`File "${file?.name}" quá lớn. Vui lòng chọn file dưới 100MB.`);
+        } else if (errCode === 'file-invalid-type') {
+            setErrorMsg(`File "${file?.name}" không đúng định dạng hỗ trợ.`);
+        } else {
+            setErrorMsg(`Không thể tải lên file "${file?.name}". Lỗi: ${errCode}`);
+        }
+    }, []);
 
     const removeFile = (index) => {
         setFiles((prev) => prev.filter((_, i) => i !== index));
@@ -24,8 +42,9 @@ function FileUploadZone({ files, setFiles }) {
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
+        onDropRejected,
         accept: ACCEPT,
-        maxSize: 20 * 1024 * 1024,
+        maxSize: 100 * 1024 * 1024,
     });
 
     const formatSize = (bytes) => {
@@ -36,6 +55,12 @@ function FileUploadZone({ files, setFiles }) {
 
     return (
         <div className="upload-zone-wrapper">
+            {errorMsg && (
+                <div className="upload-error-alert" style={{ color: '#ef4444', backgroundColor: '#fef2f2', padding: '12px', borderRadius: '8px', marginBottom: '16px', border: '1px solid #fecaca' }}>
+                    {errorMsg}
+                </div>
+            )}
+            
             {files.length === 0 && (
                 <div
                     {...getRootProps()}
@@ -51,7 +76,7 @@ function FileUploadZone({ files, setFiles }) {
                             hoặc <span>click để chọn file</span>
                         </p>
                         <p className="upload-dropzone-hint">
-                            Hỗ trợ: JPG, PNG, PDF, DOC, DOCX, XLS, XLSX (tối đa 20MB)
+                            Hỗ trợ: JPG, PNG, PDF, DOC, DOCX, XLS, XLSX, TXT, RTF (tối đa 100MB)
                         </p>
                     </div>
                 </div>
@@ -87,11 +112,22 @@ function FileUploadZone({ files, setFiles }) {
                         id="file-input-trigger"
                         type="file"
                         multiple
-                        accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx"
+                        accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx,.txt,.rtf"
                         style={{ display: 'none' }}
                         onChange={(e) => {
-                            if (e.target.files?.length) {
-                                setFiles((prev) => [...prev, ...Array.from(e.target.files)]);
+                            setErrorMsg(null);
+                            const selectedFiles = Array.from(e.target.files || []);
+                            
+                            // Thủ công kiểm tra dung lượng cho thẻ input hidden
+                            const tooLarge = selectedFiles.find(f => f.size > 100 * 1024 * 1024);
+                            if (tooLarge) {
+                                setErrorMsg(`File "${tooLarge.name}" quá lớn. Vui lòng chọn file dưới 100MB.`);
+                                e.target.value = '';
+                                return;
+                            }
+                            
+                            if (selectedFiles.length) {
+                                setFiles((prev) => [...prev, ...selectedFiles]);
                                 e.target.value = '';
                             }
                         }}

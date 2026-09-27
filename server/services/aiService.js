@@ -189,4 +189,77 @@ Example:
   }
 }
 
-module.exports = { generateFlashcards, generateFlashcardsFromImage, generateExercises };
+/**
+ * Generate multiple choice questions from document text using Gemini AI
+ * @param {string} text - Cleaned text from document
+ * @returns {Promise<Array>} Array of question objects
+ */
+async function generateQuizQuestions(text) {
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+  const prompt = `You are an expert at extracting and formatting multiple-choice questions from documents. Your task is to extract all questions from the provided text and convert them into a structured JSON array.
+
+STRICT RULES:
+1. Extract EVERY question from the text.
+2. For each question, extract its text, all options, the correct answer(s), and the explanation if provided.
+3. Determine if the question is SINGLE_CHOICE (only 1 correct answer) or MULTIPLE_CHOICE (more than 1 correct answer).
+4. The "options" field must be an array of strings (the text of the options without the A), B), C) prefix).
+5. The "correct_answers" field must be an array of integers representing the zero-based indices of the correct options in the "options" array.
+6. The "explanation" field should contain the explanation if provided, otherwise an empty string.
+
+IMPORTANT: Return ONLY a valid JSON array. No markdown, no explanation, no code blocks.
+
+Example:
+[
+  {
+    "questionText": "Which two statements are true about the tools used to configure Oracle Net Services?",
+    "options": [
+      "Oracle Net Manager can be used to locally configure naming methods on a database server.",
+      "Oracle Net Manager can be used to centrally configure listeners on any database server target.",
+      "Enterprise Manager Cloud Control can be used to centrally configure net service names for any database server target.",
+      "The lsnrctl utility requires a listener.ora file to exist before it is started.",
+      "The Oracle Net Configuration Assistant is only used when running the Oracle Installer."
+    ],
+    "correctAnswers": [0, 2],
+    "explanation": "Oracle Net Services provides user interface tools...",
+    "questionType": "MULTIPLE_CHOICE"
+  }
+]
+
+Text to extract from:
+${text}`;
+
+  console.log(`\n🤖 [AI SERVICE] Bắt đầu gọi Gemini API để trích xuất câu hỏi trắc nghiệm...`);
+  console.log(`🤖 [AI SERVICE] Độ dài văn bản gửi đi: ${text.length} ký tự. Vui lòng chờ...`);
+  
+  const startTime = Date.now();
+  const result = await model.generateContent(prompt);
+  const timeTaken = ((Date.now() - startTime) / 1000).toFixed(1);
+  
+  console.log(`🤖 [AI SERVICE] Đã nhận phản hồi từ Gemini sau ${timeTaken} giây. Bắt đầu xử lý JSON...`);
+  const response = result.response.text();
+
+  let cleaned = response.trim();
+  if (cleaned.startsWith('```')) {
+    cleaned = cleaned.replace(/^```(?:json)?\s*\n?/, '').replace(/\n?```\s*$/, '');
+  }
+
+  try {
+    const questions = JSON.parse(cleaned);
+    if (!Array.isArray(questions)) throw new Error('Response is not an array');
+    console.log(`✅ AI extracted ${questions.length} quiz questions`);
+    return questions.filter(q => q.questionText && Array.isArray(q.options) && Array.isArray(q.correctAnswers)).map(q => ({
+      questionText: q.questionText || '',
+      options: q.options || [],
+      correctAnswers: q.correctAnswers || [],
+      explanation: q.explanation || '',
+      questionType: q.questionType || (q.correctAnswers.length > 1 ? 'MULTIPLE_CHOICE' : 'SINGLE_CHOICE'),
+    }));
+  } catch (err) {
+    console.error('❌ Failed to parse AI response for quiz questions:', err.message);
+    console.error('Raw response:', response.substring(0, 500));
+    throw new Error('AI returned invalid JSON. Please try again.');
+  }
+}
+
+module.exports = { generateFlashcards, generateFlashcardsFromImage, generateExercises, generateQuizQuestions };

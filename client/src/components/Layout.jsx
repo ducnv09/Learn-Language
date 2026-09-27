@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { HiOutlineHome, HiOutlineCloudUpload, HiOutlineCollection, HiOutlineSparkles } from 'react-icons/hi';
+import { HiOutlineHome, HiOutlineCloudUpload, HiOutlineCollection, HiOutlineSparkles, HiOutlineDocumentText } from 'react-icons/hi';
 import { useState } from 'react';
 import './Layout.css';
 
@@ -7,6 +7,7 @@ const navItems = [
     { path: '/', icon: <HiOutlineHome />, label: 'Trang chủ' },
     { path: '/upload', icon: <HiOutlineCloudUpload />, label: 'Upload tài liệu' },
     { path: '/decks', icon: <HiOutlineCollection />, label: 'Bộ từ vựng' },
+    { path: '/quizzes', icon: <HiOutlineDocumentText />, label: 'Bộ câu hỏi' },
 ];
 
 function Layout() {
