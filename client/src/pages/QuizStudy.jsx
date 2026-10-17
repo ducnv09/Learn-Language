@@ -19,8 +19,14 @@ function QuizStudy() {
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
+  // Answers already checked, keyed by question index: { selected, isCorrect }
+  const [answers, setAnswers] = useState({});
 
   useEffect(() => {
+    setAnswers({});
+    setCurrentIndex(0);
+    setIsFinished(false);
+    resetState();
     fetchQuizData();
   }, [id]);
 
@@ -77,12 +83,24 @@ function QuizStudy() {
       
     setIsCorrect(correct);
     setShowResult(true);
+    setAnswers(prev => ({ ...prev, [currentIndex]: { selected, isCorrect: correct } }));
+  };
+
+  const loadQuestionState = (index) => {
+    const saved = answers[index];
+    if (saved) {
+      setSelectedOptions(saved.selected);
+      setShowResult(true);
+      setIsCorrect(saved.isCorrect);
+    } else {
+      resetState();
+    }
   };
 
   const handleNext = () => {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(currentIndex + 1);
-      resetState();
+      loadQuestionState(currentIndex + 1);
     } else {
       setIsFinished(true);
     }
@@ -91,7 +109,7 @@ function QuizStudy() {
   const handlePrev = () => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
-      resetState();
+      loadQuestionState(currentIndex - 1);
     }
   };
 
@@ -118,6 +136,7 @@ function QuizStudy() {
             <button className="btn btn-primary" onClick={() => {
               setIsFinished(false);
               setCurrentIndex(0);
+              setAnswers({});
               resetState();
             }}>
               Làm lại từ đầu
